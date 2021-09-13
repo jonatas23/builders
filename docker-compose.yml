@@ -1,0 +1,33 @@
+version: '3.7'
+services:
+
+  mysqldb:
+    container_name: mysqldb
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: builders
+    volumes:
+      - ./data:/var/lib/mysql:rw
+    networks:
+      - builders-network
+
+  web:
+    container_name: web-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    networks:
+      - builders-network
+    depends_on:
+      - mysqldb
+    restart: always
+
+networks:
+  builders-network:
+    external: true
